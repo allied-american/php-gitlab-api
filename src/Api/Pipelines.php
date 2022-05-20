@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Gitlab\Api;
 
-class Deployments extends AbstractApi
+class Pipelines extends AbstractApi
 {
   /**
    * @param int|string $project_id
@@ -36,14 +36,22 @@ class Deployments extends AbstractApi
     $resolver->setDefined('sort')
              ->setAllowedTypes('sort', 'string')
              ->setAllowedValues('sort', ['desc', 'asc']);
-    $resolver->setDefined('environment')
-             ->setAllowedTypes('environment', 'string')
-             ->setAllowedValues('environment', ['production', 'stage']);
     $resolver->setDefined('status')
              ->setAllowedTypes('status', 'string')
              ->setAllowedValues('status', ['created', 'running', 'success', 'failed', 'canceled', 'blocked']);
 
-    return $this->get($this->getProjectPath($project_id, 'deployments'), $resolver->resolve($parameters));
+    return $this->get($this->getProjectPath($project_id, 'pipelines'), $resolver->resolve($parameters));
+  }
+
+  /**
+   * @param int|string $project_id
+   * @param int        $pipeline_id
+   *
+   * @return mixed
+   */
+  public function show($project_id, int $pipeline_id)
+  {
+    return $this->get($this->getProjectPath($project_id, 'pipelines/'.$pipeline_id));
   }
 
   /**
@@ -52,8 +60,8 @@ class Deployments extends AbstractApi
    *
    * @return mixed
    */
-  public function show($project_id, int $deployment_id)
+  public function remove($project_id, int $pipeline_id)
   {
-    return $this->get($this->getProjectPath($project_id, 'deployments/'.$deployment_id));
+    return $this->delete($this->getProjectPath($project_id, 'pipelines/'.self::encodePath($pipeline_id)));
   }
 }
